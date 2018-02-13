@@ -1,0 +1,8 @@
+node_modules/
+*.sublime-*
+.DS_Store
+temp/
+.cache/
+assets/styles/sprites/
+*.log
+temp.txt
