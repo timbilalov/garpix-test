@@ -23,7 +23,14 @@
         return (
             <div className="col-md-4">
                 <div className="card mb-4 box-shadow">
-                    <img className="card-img-top" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="Card image cap" />
+                    {
+                        album.images && album.images.length > 0 &&
+                        <img className="card-img-top" src={ album.images[0] } alt="Card image cap" />
+                    }
+                    {
+                        (!album.images || album.images.length <= 0) &&
+                        <img className="card-img-top" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="Card image cap" />
+                    }
                     <div className="card-body">
                         <p className="card-text">{ album.name }</p>
                         <div className="d-flex justify-content-between align-items-center">
@@ -34,7 +41,9 @@
                                 <button type="button" className="btn btn-sm btn-outline-secondary" onClick={ () => props.onEditStart(album.id) }>Edit</button>
                                 <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => props.onRemove(album.id) }>Delete</button>
                             </div>
-                            <small className="text-muted">9 photos</small>
+                            <small className="text-muted">
+                                { (album.images || []).length }&nbsp;photos
+                            </small>
                         </div>
                     </div>
 
@@ -316,7 +325,60 @@
         constructor(props) {
             super(props);
             this.state = {
+                albums: albums,
+            }
+        }
+
+        handleSave(component) {
+            const files = component.state.files;
+
+            const id = parseInt(this.props.match.params.number);
+            const albums = this.state.albums.slice();
+            const album = albums.filter((elem) => elem.id === id)[0];
+            if (!album) {
+                return;
+            }
+
+            album.images = album.images || [];
+            const reader = new FileReader();
+            reader.readAsDataURL(files[0]);
+            const context = this;
+            reader.onloadend = function() {
+                const base64data = reader.result;
+                album.images.push(base64data);
+
+                context.setState({
+                    albums: albums
+                });
+
+                if (localStorage) {
+                    localStorage.setItem(albumsStorageName, JSON.stringify(albums))
+                }
+            }
+
+
+            component.setState({
+                files: [],
+                preview: false
+            });
+        }
+
+        handleRemove(index) {
+            const id = parseInt(this.props.match.params.number);
+            const albums = this.state.albums.slice();
+            const album = albums.filter((elem) => elem.id === id)[0];
+            if (!album) {
+                return;
+            }
+
+            const albumImages = album.images;
+            albumImages.splice(index, 1);
+            this.setState({
                 albums: albums
+            });
+
+            if (localStorage) {
+                localStorage.setItem(albumsStorageName, JSON.stringify(albums));
             }
         }
 
@@ -327,10 +389,110 @@
             if (!album) {
                 return;
             }
+
+            let albumImages = album.images || [];
+            albumImages = albumImages.map((elem, index) => {
+                return (
+                    <div className="col-md-4">
+                        <div className="card mb-4 box-shadow">
+                            <img className="card-img-top" src={ elem } alt="Card image cap" />
+
+                            <div className="card-body">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div className="btn-group">
+                                        <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => this.handleRemove(index) }>Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            });
+
             return (
                 <div>
+                    <div className="pb-5">
+                        <Link to={{ pathname: "/" }}>
+                            <button className="btn btn-sm btn-light">Назад</button>
+                        </Link>
+                    </div>
+
                     <h1>Альбом: { album.name }</h1>
-                    <p>ID: { album.id }</p>
+
+                    {
+                        albumImages &&
+                        <div className="row py-5">
+                            { albumImages }
+                        </div>
+                    }
+
+                    <ImageUpload onSave={ (component) => this.handleSave(component) } />
+                </div>
+            )
+        }
+    }
+
+    const { Component } = React
+    const { render } = ReactDOM
+    const Dropzone = reactDropzone
+
+
+    const handleDropRejected = (...args) => console.log('reject', args)
+
+    class ImageUpload extends Component {
+        constructor(props) {
+            super(props)
+            this.state = {
+                preview: null,
+                files: []
+            }
+        }
+
+        handleDrop(files) {
+            this.setState({
+                files: files,
+                preview: files[0].preview
+            })
+        }
+
+        render() {
+            const { preview } = this.state
+
+            return (
+                <div>
+                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#modal-new-image">
+                        Добавить изображение
+                    </button>
+
+                    <div className="modal fade" id="modal-new-image" tabIndex="-1" role="dialog" aria-hidden="true">
+                        <div className="modal-dialog modal-dialog-centered" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Добавить изображение</h5>
+                                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="dd">
+                                        <div className="dd__zone dd__zone--fake bg-light border border-primary rounded">
+                                            <span className="dd__text">Drag a file here or click to upload.</span>
+                                        </div>
+
+                                        <Dropzone className="dd__zone" onDrop={ (files) => this.handleDrop(files) } accept="image/jpeg,image/jpg,image/tiff,image/gif" multiple={ false } onDropRejected={ handleDropRejected } />
+                                        {
+                                            preview &&
+                                            <img className="dd__img" src={ preview } alt="image preview" />
+                                        }
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ () => this.props.onSave(this) }>Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )
         }

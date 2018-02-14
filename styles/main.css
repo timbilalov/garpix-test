@@ -1,3 +1,47 @@
 .page-footer {
     padding: 2rem 0;
 }
+
+.dd {
+    position: relative;
+}
+
+.dd:before {
+    content: "";
+    display: block;
+    padding-top: 50%;
+}
+
+.dd__zone {
+    text-align: center;
+}
+
+.dd__zone,
+.dd__img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.dd__img {
+    object-fit: cover;
+    object-position: center center;
+    z-index: 1;
+}
+
+.dd__zone {
+    z-index: 2;
+}
+
+.dd__zone--fake {
+    z-index: 0;
+}
+
+.dd__text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
