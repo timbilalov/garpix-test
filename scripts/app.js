@@ -1,4 +1,9 @@
 (function() {
+    const HashRouter = window.ReactRouterDOM.HashRouter;
+    const Switch = window.ReactRouterDOM.Switch;
+    const Route = window.ReactRouterDOM.Route;
+    const Link = window.ReactRouterDOM.Link;
+
     let albums;
     let lastID;
     const albumsStorageName = "albums";
@@ -23,7 +28,9 @@
                         <p className="card-text">{ album.name }</p>
                         <div className="d-flex justify-content-between align-items-center">
                             <div className="btn-group">
-                                <button type="button" className="btn btn-sm btn-outline-secondary">View</button>
+                                <Link to={{ pathname: "/album/" + album.id }}>
+                                    <button type="button" className="btn btn-sm btn-outline-secondary">View</button>
+                                </Link>
                                 <button type="button" className="btn btn-sm btn-outline-secondary" onClick={ () => props.onEditStart(album.id) }>Edit</button>
                                 <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => props.onRemove(album.id) }>Delete</button>
                             </div>
@@ -292,6 +299,7 @@
             });
 
             editAlbumModals = $(".modal-edit-album");
+            Holder.run();
         }
 
         componentDidUpdate() {
@@ -304,8 +312,49 @@
         }
     }
 
-    ReactDOM.render(
-        <AlbumsList />,
-        document.querySelector(".js-albums-container")
-    );
+    class AlbumDetailed extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                albums: albums
+            }
+        }
+
+        render() {
+            const id = parseInt(this.props.match.params.number);
+            const albums = this.state.albums.slice();
+            const album = albums.filter((elem) => elem.id === id)[0];
+            if (!album) {
+                return;
+            }
+            return (
+                <div>
+                    <h1>Альбом: { album.name }</h1>
+                    <p>ID: { album.id }</p>
+                </div>
+            )
+        }
+    }
+
+
+    class App extends React.Component {
+        render() {
+            return (
+                <main>
+                    <Switch>
+                        <Route exact path='/' component={ AlbumsList }/>
+                        <Route path='/album/:number' component={ AlbumDetailed }/>
+                    </Switch>
+                </main>
+            )
+        }
+    }
+
+    ReactDOM.render((
+        <HashRouter>
+            <App />
+        </HashRouter>
+        ),
+        document.getElementById("app")
+    )
 })();
