@@ -344,6 +344,11 @@
             super(props);
             this.state = {
                 albums: albums,
+                isUploading: false,
+                uploading: {
+                    max: 0,
+                    cur: 0
+                }
             }
         }
 
@@ -359,21 +364,74 @@
 
             album.images = album.images || [];
             const context = this;
-            files.forEach((file) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = function() {
-                    const base64data = reader.result;
-                    album.images.push(base64data);
-
-                    context.setState({
-                        albums: albums
-                    });
-
-                    if (localStorage) {
-                        localStorage.setItem(albumsStorageName, JSON.stringify(albums))
-                    }
+            const filesCount = files.length;
+            let k = 0;
+            this.setState({
+                isUploading: true,
+                uploading: {
+                    max: filesCount,
+                    cur: k
                 }
+            })
+
+            files.forEach((file) => {
+                // TODO:
+                // В силу того, что на сервисе imgur.com не работает регистрация
+                // (как следствие, невозможно установить подключение к API),
+                // это лишь имитация отправки изображений на сервер.
+                // Но принципы работы для настоящего подключения будут примерно такие же.
+                const fetchUrl = window.location;
+                fetch(fetchUrl, {
+                    method: 'POST',
+                    data: {
+                        file: file
+                    }
+                })
+                .then(function(response) {
+                    // TODO:
+                    // При подключении к настоящему сервису хранения изображений
+                    // в этой части программы будет обработка ответа, получение ссылки на изображение,
+                    // и добавление ссылки в localStorage.
+                    // Пока же, конвертим изображения в base64.
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onloadend = function() {
+                        const base64data = reader.result;
+                        album.images.push(base64data);
+
+                        context.setState({
+                            albums: albums
+                        });
+
+                        if (localStorage) {
+                            localStorage.setItem(albumsStorageName, JSON.stringify(albums))
+                        }
+                    }
+
+                    console.log("file uploaded: ", file);
+                    k++;
+                    context.setState({
+                        uploading: {
+                            max: filesCount,
+                            cur: k
+                        }
+                    })
+
+                    if (k === filesCount) {
+                        // Это для пользователей с хорошим быстрым интернетом -
+                        // чтобы вместо мелькания они увидели, что всё работает
+                        // (психологический эффект).
+                        setTimeout(function() {
+                            context.setState({
+                                isUploading: false,
+                                uploading: {
+                                    max: 0,
+                                    cur: 0
+                                }
+                            })
+                        }, 1000);
+                    }
+                });
             })
 
 
@@ -400,6 +458,27 @@
             if (localStorage) {
                 localStorage.setItem(albumsStorageName, JSON.stringify(albums));
             }
+        }
+
+        clearAll() {
+            const id = parseInt(this.props.match.params.number);
+            const albums = this.state.albums.slice();
+            const album = albums.filter((elem) => elem.id === id)[0];
+            if (!album) {
+                return;
+            }
+
+            album.images = [];
+
+            this.setState({
+                albums: albums
+            })
+
+            if (localStorage) {
+                localStorage.setItem(albumsStorageName, JSON.stringify(albums));
+            }
+
+            console.log("album id=" + id + " cleared");
         }
 
         render() {
@@ -433,6 +512,26 @@
 
                     <h1>Альбом: { album.name }</h1>
 
+
+                    {
+                        this.state.isUploading &&
+
+                        <div className="my-5">
+                            <p>Изображения загружаются</p>
+
+                            <div className="progress">
+                                <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style={{ width: Math.round((1 - (this.state.uploading.max - this.state.uploading.cur) / this.state.uploading.max) * 100) + "%" }}></div>
+                            </div>
+                        </div>
+                    }
+
+                    {
+                        !this.state.isUploading &&
+                        <div className="mt-5">
+                            <ImageUpload onSave={ (component) => this.handleSave(component) } />
+                        </div>
+                    }
+
                     <div className="py-5">
                         {
                             albumImages && albumImages.length > 0 &&
@@ -448,7 +547,14 @@
                         }
                     </div>
 
-                    <ImageUpload onSave={ (component) => this.handleSave(component) } />
+                    {
+                        (album.images || []).length > 0 &&
+                        <div className="mt-5">
+                            <button type="button" className="btn btn-sm btn-light" onClick={ () => this.clearAll() }>
+                                Удалить все изображения в альбоме
+                            </button>
+                        </div>
+                    }
                 </div>
             )
         }
