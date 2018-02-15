@@ -397,13 +397,9 @@
                         <div className="card mb-4 box-shadow">
                             <img className="card-img-top" src={ elem } alt="Card image cap" />
 
-                            <div className="card-body">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="btn-group">
-                                        <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => this.handleRemove(index) }>Delete</button>
-                                    </div>
-                                </div>
-                            </div>
+                            <button type="button" className="close" aria-label="Delete" onClick={ () => this.handleRemove(index) }>
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
                     </div>
                 )
