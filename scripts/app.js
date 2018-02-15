@@ -23,26 +23,27 @@
         return (
             <div className="col-md-4">
                 <div className="card mb-4 box-shadow">
-                    {
-                        album.images && album.images.length > 0 &&
-                        <img className="card-img-top" src={ album.images[0] } alt="Card image cap" />
-                    }
-                    {
-                        (!album.images || album.images.length <= 0) &&
-                        <img className="card-img-top" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="Card image cap" />
-                    }
+                    <Link to={{ pathname: "/album/" + album.id }}>
+                        <div className="card-img-top dd__img-holder dd__img-holder--v2">
+                        {
+                            album.images && album.images.length > 0 &&
+                            <img className="dd__img" src={ album.images[0] } alt="Card image cap" />
+                        }
+                        {
+                            (!album.images || album.images.length <= 0) &&
+                            <img className="dd__img" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="Card image cap" />
+                        }
+                        </div>
+                    </Link>
                     <div className="card-body">
                         <p className="card-text">{ album.name }</p>
                         <div className="d-flex justify-content-between align-items-center">
                             <div className="btn-group">
-                                <Link to={{ pathname: "/album/" + album.id }}>
-                                    <button type="button" className="btn btn-sm btn-outline-secondary">View</button>
-                                </Link>
-                                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={ () => props.onEditStart(album.id) }>Edit</button>
-                                <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => props.onRemove(album.id) }>Delete</button>
+                                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={ () => props.onEditStart(album.id) }>Редактировать</button>
+                                <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => props.onRemove(album.id) }>Удалить</button>
                             </div>
                             <small className="text-muted">
-                                { (album.images || []).length }&nbsp;photos
+                                { (album.images || []).length }&nbsp;изображений
                             </small>
                         </div>
                     </div>
@@ -71,8 +72,8 @@
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary" onClick={props.onAdd}>Save changes</button>
+                            <button type="button" className="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                            <button type="button" className="btn btn-primary" onClick={props.onAdd}>Добавить</button>
                         </div>
                     </div>
                 </div>
@@ -100,8 +101,8 @@
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary" onClick={ props.onEditSave }>Save changes</button>
+                            <button type="button" className="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                            <button type="button" className="btn btn-primary" onClick={ props.onEditSave }>Сохранить</button>
                         </div>
                     </div>
                 </div>
@@ -138,6 +139,10 @@
             }
 
             var albumName = album.name;
+            // TODO
+            // В настоящем приложении необходимо дополнить проверкой
+            // на уникальность имени. В противном случае, можно создавать альбомы
+            // с одинаковымы названиями.
             if (!albumName || typeof albumName !== "string") {
                 return;
             }
@@ -244,6 +249,10 @@
                 return;
             }
 
+            // TODO:
+            // В настоящем приложении, необходимо дополнить всплывающим окном,
+            // с просьбой подтвердить действие.
+
             albumToRemove = albumToRemove[0];
             albums.splice(albums.indexOf(albumToRemove), 1);
             this.setState({
@@ -258,6 +267,10 @@
         }
 
         clearAll() {
+            // TODO:
+            // В настоящем приложении, необходимо дополнить всплывающим окном,
+            // с просьбой подтвердить действие.
+
             this.setState({
                 albums: [],
                 lastID: 0
@@ -287,7 +300,6 @@
                         { albums }
                     </div>
 
-
                     {
                         this.state.albums.length > 0 &&
                         <div className="pt-5">
@@ -301,6 +313,12 @@
         }
 
         componentDidMount() {
+            if (localStorage && localStorage.getItem(albumsStorageName)) {
+                this.setState({
+                    albums: JSON.parse(localStorage.getItem(albumsStorageName))
+                });
+            }
+
             newAlbumNameInput = $("#input-new-album-name");
             newAlbumModal = $("#modal-new-album");
             newAlbumModal.on("shown.bs.modal", function() {
@@ -340,26 +358,28 @@
             }
 
             album.images = album.images || [];
-            const reader = new FileReader();
-            reader.readAsDataURL(files[0]);
             const context = this;
-            reader.onloadend = function() {
-                const base64data = reader.result;
-                album.images.push(base64data);
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    const base64data = reader.result;
+                    album.images.push(base64data);
 
-                context.setState({
-                    albums: albums
-                });
+                    context.setState({
+                        albums: albums
+                    });
 
-                if (localStorage) {
-                    localStorage.setItem(albumsStorageName, JSON.stringify(albums))
+                    if (localStorage) {
+                        localStorage.setItem(albumsStorageName, JSON.stringify(albums))
+                    }
                 }
-            }
+            })
 
 
             component.setState({
                 files: [],
-                preview: false
+                preview: []
             });
         }
 
@@ -393,14 +413,12 @@
             let albumImages = album.images || [];
             albumImages = albumImages.map((elem, index) => {
                 return (
-                    <div className="col-md-4">
-                        <div className="card mb-4 box-shadow">
-                            <img className="card-img-top" src={ elem } alt="Card image cap" />
+                    <div className="card mb-4 box-shadow" key={ index }>
+                        <img className="card-img-top rounded" src={ elem } alt="Card image cap" />
 
-                            <button type="button" className="close" aria-label="Delete" onClick={ () => this.handleRemove(index) }>
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
+                        <button type="button" className="close close--abs" aria-label="Delete" onClick={ () => this.handleRemove(index) }>
+                            <span aria-hidden="true">×</span>
+                        </button>
                     </div>
                 )
             });
@@ -415,16 +433,32 @@
 
                     <h1>Альбом: { album.name }</h1>
 
-                    {
-                        albumImages &&
-                        <div className="row py-5">
-                            { albumImages }
-                        </div>
-                    }
+                    <div className="py-5">
+                        {
+                            albumImages && albumImages.length > 0 &&
+                            <div className="card-columns">
+                                { albumImages }
+                            </div>
+                        }
+                        {
+                            !albumImages || albumImages.length <= 0 &&
+                            <div>
+                                Здесь пока что пусто...
+                            </div>
+                        }
+                    </div>
 
                     <ImageUpload onSave={ (component) => this.handleSave(component) } />
                 </div>
             )
+        }
+
+        componentWillMount() {
+            if (localStorage && localStorage.getItem(albumsStorageName)) {
+                this.setState({
+                    albums: JSON.parse(localStorage.getItem(albumsStorageName))
+                });
+            }
         }
     }
 
@@ -439,52 +473,78 @@
         constructor(props) {
             super(props)
             this.state = {
-                preview: null,
+                preview: [],
                 files: []
             }
         }
 
         handleDrop(files) {
+            const preview = files.map((item) => item.preview);
+            this.setState({
+                files: this.state.files.slice().concat(files),
+                preview: this.state.preview.slice().concat(preview)
+            })
+        }
+
+        handleRemove(index) {
+            const preview = this.state.preview.slice();
+            const files = this.state.files.slice();
+            preview.splice(index, 1);
+            files.splice(index, 1);
             this.setState({
                 files: files,
-                preview: files[0].preview
+                preview: preview,
             })
         }
 
         render() {
-            const { preview } = this.state
+            const previewItems = (this.state.preview || []).map((item, index) => {
+                return (
+                    <div className="dd__img-holder rounded my-2" key={ index }>
+                        <img src={ item } className="dd__img rounded" alt=""/>
+                        <button type="button" className="close close--abs" aria-label="Delete" onClick={ () => this.handleRemove(index) }>
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                );
+            });
 
             return (
                 <div>
                     <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#modal-new-image">
-                        Добавить изображение
+                        Загрузить изображения
                     </button>
 
                     <div className="modal fade" id="modal-new-image" tabIndex="-1" role="dialog" aria-hidden="true">
                         <div className="modal-dialog modal-dialog-centered" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h5 className="modal-title">Добавить изображение</h5>
+                                    <h5 className="modal-title">Загрузить изображения</h5>
                                     <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="dd">
-                                        <div className="dd__zone dd__zone--fake bg-light border border-primary rounded">
-                                            <span className="dd__text">Drag a file here or click to upload.</span>
+                                        <div className="dd">
+                                            <div className="dd__zone dd__zone--fake bg-light border border-primary rounded">
+                                                <span className="dd__text text-muted">Перетащите изображения в эту область, или кликните, чтобы выбрать файлы</span>
+                                            </div>
                                         </div>
 
-                                        <Dropzone className="dd__zone" onDrop={ (files) => this.handleDrop(files) } accept="image/jpeg,image/jpg,image/tiff,image/gif" multiple={ false } onDropRejected={ handleDropRejected } />
+                                        <Dropzone className="dd__zone" onDrop={ (files) => this.handleDrop(files) } accept="image/jpeg,image/png,image/jpg,image/tiff,image/gif" multiple={ true } onDropRejected={ handleDropRejected } />
+
                                         {
-                                            preview &&
-                                            <img className="dd__img" src={ preview } alt="image preview" />
+                                            previewItems && previewItems.length > 0 &&
+                                            <div className="dd">
+                                                { previewItems }
+                                            </div>
                                         }
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ () => this.props.onSave(this) }>Save changes</button>
+                                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                                    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ () => this.props.onSave(this) }>Загрузить изображения</button>
                                 </div>
                             </div>
                         </div>

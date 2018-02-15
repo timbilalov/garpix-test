@@ -4,12 +4,30 @@
 
 .dd {
     position: relative;
+    min-height: 150px;
 }
 
-.dd:before {
+.dd--static {
+    position: static;
+}
+
+.dd__img-holder {
+    position: relative;
+    overflow: hidden;
+}
+
+.dd__img-holder:before {
     content: "";
     display: block;
     padding-top: 50%;
+}
+
+.dd__img-holder--v2:before {
+    padding-top: 60%;
+}
+
+.dd__img-holder .close {
+    z-index: 3;
 }
 
 .dd__zone {
@@ -29,6 +47,8 @@
     object-fit: cover;
     object-position: center center;
     z-index: 1;
+    /* important из-за holder.js, который проставляет height инлайном*/
+    height: 100% !important;
 }
 
 .dd__zone {
@@ -37,6 +57,8 @@
 
 .dd__zone--fake {
     z-index: 0;
+    /*important, потому что в бутстрапе на класс .border-* стоит important, и надо его перекрыть */
+    border-style: dashed !important;
 }
 
 .dd__text {
@@ -44,4 +66,13 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+button.close--abs {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: #fff;
+    padding: 5px 6px;
+    line-height: 0.8;
 }
