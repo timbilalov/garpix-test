@@ -5,6 +5,8 @@ const Link = window.ReactRouterDOM.Link;
 
 class App extends React.Component {
     render() {
+        document.querySelector(".preloader").style.display = "none";
+
         return (
             <div>
                 <Switch>
