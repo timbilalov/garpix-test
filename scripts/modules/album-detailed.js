@@ -2,7 +2,7 @@ class AlbumDetailed extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            albums: albums,
+            albums: [],
             isUploading: false,
             uploading: {
                 max: 0,
@@ -174,7 +174,7 @@ class AlbumDetailed extends React.Component {
             <div>
                 <div className="pb-5">
                     <Link to={{ pathname: "/" }}>
-                        <button className="btn btn-sm btn-light">Назад</button>
+                        <button className="btn btn-sm btn-light">⬅ Назад</button>
                     </Link>
                 </div>
 

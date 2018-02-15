@@ -240,9 +240,15 @@ class AlbumsList extends React.Component {
 
     componentWillMount() {
         if (localStorage && localStorage.getItem(App.consts.albumsStorageName)) {
+            let albums = JSON.parse(localStorage.getItem(App.consts.albumsStorageName)) || [];
+            let lastID = parseInt(localStorage.getItem(App.consts.albumsStorageLastID));
+            if (isNaN(lastID)) {
+                lastID = 0;
+            }
+
             this.setState({
-                albums: JSON.parse(localStorage.getItem(App.consts.albumsStorageName)),
-                lastID: parseInt(localStorage.getItem(App.consts.albumsStorageLastID))
+                albums: albums,
+                lastID: lastID
             });
         };
     }

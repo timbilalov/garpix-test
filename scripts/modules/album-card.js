@@ -18,14 +18,16 @@ function AlbumCard(props) {
                 </Link>
                 <div className="card-body">
                     <p className="card-text">{ album.name }</p>
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex flex-wrap justify-content-between align-items-center">
                         <div className="btn-group">
                             <button type="button" className="btn btn-sm btn-outline-secondary" onClick={ () => props.onEditStart(album.id) } data-toggle="modal" data-target="#modal-edit-album">Редактировать</button>
                             <button type="button" className="btn btn-sm btn-outline-danger" onClick={ () => props.onRemove(album.id) }>Удалить</button>
                         </div>
-                        <small className="text-muted">
-                            { (album.images || []).length }&nbsp;изображений
-                        </small>
+                        <div className="py-2">
+                            <small className="text-muted">
+                                { (album.images || []).length }&nbsp;изобр.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
