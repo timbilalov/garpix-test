@@ -1,4 +1,7 @@
-function AlbumCard(props) {
+import React from "react";
+import { Link } from "react-router-dom";
+
+export default function AlbumCard(props) {
     const album = props.value;
 
     return (
@@ -8,11 +11,11 @@ function AlbumCard(props) {
                     <div className="card-img-top dd__img-holder dd__img-holder--v2">
                     {
                         album.images && album.images.length > 0 &&
-                        <img className="dd__img" src={ album.images[0] } alt="Card image cap" />
+                        <img className="dd__img" src={ album.images[0] } alt="" />
                     }
                     {
                         (!album.images || album.images.length <= 0) &&
-                        <img className="dd__img" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="Card image cap" />
+                        <img className="dd__img" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail" alt="" />
                     }
                     </div>
                 </Link>

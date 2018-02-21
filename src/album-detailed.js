@@ -1,4 +1,9 @@
-class AlbumDetailed extends React.Component {
+import React from "react";
+import App from "./index";
+import { Link } from "react-router-dom";
+import ImageUpload from "./image-upload";
+
+export default class AlbumDetailed extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,7 +23,7 @@ class AlbumDetailed extends React.Component {
             return;
         }
 
-        const id = parseInt(this.props.match.params.number);
+        const id = parseInt(this.props.match.params.number, 10);
         const albums = this.state.albums.slice();
         const album = albums.filter((elem) => elem.id === id)[0];
         if (!album) {
@@ -108,7 +113,7 @@ class AlbumDetailed extends React.Component {
     }
 
     handleRemove(index) {
-        const id = parseInt(this.props.match.params.number);
+        const id = parseInt(this.props.match.params.number, 10);
         const albums = this.state.albums.slice();
         const album = albums.filter((elem) => elem.id === id)[0];
         if (!album) {
@@ -129,7 +134,7 @@ class AlbumDetailed extends React.Component {
     }
 
     clearAll() {
-        const id = parseInt(this.props.match.params.number);
+        const id = parseInt(this.props.match.params.number, 10);
         const albums = this.state.albums.slice();
         const album = albums.filter((elem) => elem.id === id)[0];
         if (!album) {
@@ -150,7 +155,7 @@ class AlbumDetailed extends React.Component {
     }
 
     render() {
-        const id = parseInt(this.props.match.params.number);
+        const id = parseInt(this.props.match.params.number, 10);
         const albums = this.state.albums.slice();
         const album = albums.filter((elem) => elem.id === id)[0];
         if (!album) {
@@ -161,7 +166,7 @@ class AlbumDetailed extends React.Component {
         albumImages = albumImages.map((elem, index) => {
             return (
                 <div className="card mb-4 box-shadow" key={ index }>
-                    <img className="card-img-top rounded" src={ elem } alt="Card image cap" />
+                    <img className="card-img-top rounded" src={ elem } alt="" />
 
                     <button type="button" className="close close--abs" aria-label="Delete" onClick={ () => this.handleRemove(index) }>
                         <span aria-hidden="true">×</span>
@@ -202,13 +207,13 @@ class AlbumDetailed extends React.Component {
 
                 <div className="py-5">
                     {
-                        albumImages && albumImages.length > 0 &&
+                        (albumImages && albumImages.length > 0) &&
                         <div className="card-columns">
                             { albumImages }
                         </div>
                     }
                     {
-                        !albumImages || albumImages.length <= 0 &&
+                        (!albumImages || albumImages.length <= 0) &&
                         <div>
                             Здесь пока что пусто...
                         </div>
@@ -236,7 +241,7 @@ class AlbumDetailed extends React.Component {
     }
 
     componentDidMount() {
-        const id = parseInt(this.props.match.params.number);
+        const id = parseInt(this.props.match.params.number, 10);
         const albums = this.state.albums.slice();
         const album = albums.filter((elem) => elem.id === id)[0];
         if (!album) {

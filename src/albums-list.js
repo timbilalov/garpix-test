@@ -1,4 +1,11 @@
-class AlbumsList extends React.Component {
+import React from "react";
+import App from "./index";
+import AlbumCard from "./album-card";
+import ModalEditAlbum from "./modal-edit-album";
+import ModalNewAlbum from "./modal-new-album";
+import Holder from "holderjs";
+
+export default class AlbumsList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -71,7 +78,7 @@ class AlbumsList extends React.Component {
     }
 
     handleEditStart(id) {
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -96,7 +103,7 @@ class AlbumsList extends React.Component {
 
     handleEditSave() {
         let id = this.state.editAlbum.id;
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -132,7 +139,7 @@ class AlbumsList extends React.Component {
     }
 
     handleRemove(id) {
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -241,7 +248,7 @@ class AlbumsList extends React.Component {
     componentWillMount() {
         if (localStorage && localStorage.getItem(App.consts.albumsStorageName)) {
             let albums = JSON.parse(localStorage.getItem(App.consts.albumsStorageName)) || [];
-            let lastID = parseInt(localStorage.getItem(App.consts.albumsStorageLastID));
+            let lastID = parseInt(localStorage.getItem(App.consts.albumsStorageLastID), 10);
             if (isNaN(lastID)) {
                 lastID = 0;
             }
