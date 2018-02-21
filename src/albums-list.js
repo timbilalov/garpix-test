@@ -78,7 +78,7 @@ export default class AlbumsList extends React.Component {
     }
 
     handleEditStart(id) {
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -103,7 +103,7 @@ export default class AlbumsList extends React.Component {
 
     handleEditSave() {
         let id = this.state.editAlbum.id;
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -139,7 +139,7 @@ export default class AlbumsList extends React.Component {
     }
 
     handleRemove(id) {
-        id = parseInt(id);
+        id = parseInt(id, 10);
         if (isNaN(id)) {
             return;
         }
@@ -248,7 +248,7 @@ export default class AlbumsList extends React.Component {
     componentWillMount() {
         if (localStorage && localStorage.getItem(App.consts.albumsStorageName)) {
             let albums = JSON.parse(localStorage.getItem(App.consts.albumsStorageName)) || [];
-            let lastID = parseInt(localStorage.getItem(App.consts.albumsStorageLastID));
+            let lastID = parseInt(localStorage.getItem(App.consts.albumsStorageLastID), 10);
             if (isNaN(lastID)) {
                 lastID = 0;
             }
