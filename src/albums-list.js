@@ -1,4 +1,11 @@
-class AlbumsList extends React.Component {
+import React from "react";
+import App from "./index";
+import AlbumCard from "./album-card";
+import ModalEditAlbum from "./modal-edit-album";
+import ModalNewAlbum from "./modal-new-album";
+import Holder from "holderjs";
+
+export default class AlbumsList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

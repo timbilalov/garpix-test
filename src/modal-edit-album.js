@@ -1,4 +1,6 @@
-function ModalEditAlbum(props) {
+import React from "react";
+
+export default function ModalEditAlbum(props) {
     return (
         <div className="modal fade" id="modal-edit-album" tabIndex="-1" role="dialog" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">

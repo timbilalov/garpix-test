@@ -1,6 +1,7 @@
-const Dropzone = reactDropzone;
+import React from "react";
+import Dropzone from "react-dropzone";
 
-class ImageUpload extends React.Component {
+export default class ImageUpload extends React.Component {
     constructor(props) {
         super(props)
         this.state = {

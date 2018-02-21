@@ -1,4 +1,9 @@
-class AlbumDetailed extends React.Component {
+import React from "react";
+import App from "./index";
+import { Link } from "react-router-dom";
+import ImageUpload from "./image-upload";
+
+export default class AlbumDetailed extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

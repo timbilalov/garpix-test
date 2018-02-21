@@ -1,4 +1,6 @@
-function ModalNewAlbum(props) {
+import React from "react";
+
+export default function ModalNewAlbum(props) {
     return (
         <div className="modal fade" id="modal-new-album" tabIndex="-1" role="dialog" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
